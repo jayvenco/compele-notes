@@ -69,6 +69,29 @@ export const api = {
     if (!res.ok) throw new Error('Backup export failed');
     return res.blob();
   },
+  // Boards
+  listBoards: () => request('/boards'),
+  createBoard: (name) => request('/boards', { method: 'POST', body: JSON.stringify({ name }) }),
+  getBoard: (id) => request(`/boards/${id}`),
+  renameBoard: (id, name) => request(`/boards/${id}`, { method: 'PUT', body: JSON.stringify({ name }) }),
+  deleteBoard: (id) => request(`/boards/${id}`, { method: 'DELETE' }),
+  addColumn: (boardId, name, color) =>
+    request(`/boards/${boardId}/columns`, { method: 'POST', body: JSON.stringify({ name, color }) }),
+  updateColumn: (boardId, colId, patch) =>
+    request(`/boards/${boardId}/columns/${colId}`, { method: 'PUT', body: JSON.stringify(patch) }),
+  deleteColumn: (boardId, colId) =>
+    request(`/boards/${boardId}/columns/${colId}`, { method: 'DELETE' }),
+  moveCard: (boardId, note_id, column_id, position) =>
+    request(`/boards/${boardId}/move`, {
+      method: 'PATCH',
+      body: JSON.stringify({ note_id, column_id, position }),
+    }),
+
+  // API keys
+  listApiKeys: () => request('/keys'),
+  createApiKey: (name) => request('/keys', { method: 'POST', body: JSON.stringify({ name }) }),
+  deleteApiKey: (id) => request(`/keys/${id}`, { method: 'DELETE' }),
+
   importBackup: async (file) => {
     const form = new FormData();
     form.append('backup', file);

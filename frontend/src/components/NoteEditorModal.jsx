@@ -26,6 +26,7 @@ function isNotePayloadEmpty(payload) {
 
 export default function NoteEditorModal({
   noteId,
+  initialColumnId,
   categories,
   tags,
   onClose,
@@ -33,7 +34,10 @@ export default function NoteEditorModal({
   onDeleted,
   onTagsChanged,
 }) {
-  const [note, setNote] = useState(EMPTY_NOTE);
+  const [note, setNote] = useState(() => ({
+    ...EMPTY_NOTE,
+    kanban_column_id: initialColumnId || null,
+  }));
   const [savedId, setSavedId] = useState(noteId);
   const [loading, setLoading] = useState(!!noteId);
   const [tagDraft, setTagDraft] = useState('');

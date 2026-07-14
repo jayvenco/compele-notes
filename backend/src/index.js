@@ -9,6 +9,8 @@ import notesRouter from './routes/notes.js';
 import imagesRouter from './routes/images.js';
 import backupRouter from './routes/backup.js';
 import settingsRouter from './routes/settings.js';
+import boardsRouter from './routes/boards.js';
+import apikeysRouter from './routes/apikeys.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -25,6 +27,8 @@ app.use('/api/notes', notesRouter);
 app.use('/api/images', imagesRouter);
 app.use('/api/backup', backupRouter);
 app.use('/api/settings', settingsRouter);
+app.use('/api/boards', boardsRouter);
+app.use('/api/keys', apikeysRouter);
 
 app.use((err, req, res, next) => {
   console.error(err);

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { api } from '../lib/api.js';
 import { COLORS, colorClasses } from '../lib/utils.jsx';
+import ApiKeyManager from './ApiKeyManager.jsx';
 
 function Section({ title, children }) {
   return (
@@ -227,6 +228,10 @@ export default function Sidebar({
           ⬆ Restore from backup
         </button>
         <input ref={importRef} type="file" accept=".zip" className="hidden" onChange={handleImportFile} />
+      </Section>
+
+      <Section title="API-sleutels">
+        <ApiKeyManager />
       </Section>
     </aside>
   );

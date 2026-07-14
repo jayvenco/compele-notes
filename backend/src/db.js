@@ -71,6 +71,44 @@ CREATE TABLE IF NOT EXISTS settings (
   value TEXT NOT NULL,
   PRIMARY KEY (user_id, key)
 );
+
+CREATE TABLE IF NOT EXISTS kanban_boards (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS kanban_columns (
+  id TEXT PRIMARY KEY,
+  board_id TEXT NOT NULL REFERENCES kanban_boards(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  position REAL NOT NULL DEFAULT 0,
+  color TEXT NOT NULL DEFAULT 'gray',
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_columns_board ON kanban_columns(board_id);
+
+CREATE TABLE IF NOT EXISTS api_keys (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  key_prefix TEXT NOT NULL,
+  key_hash TEXT NOT NULL UNIQUE,
+  created_at TEXT NOT NULL,
+  last_used_at TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_apikeys_hash ON api_keys(key_hash);
 `);
+
+// Lightweight migrations: add columns to notes for kanban if not present yet
+for (const ddl of [
+  'ALTER TABLE notes ADD COLUMN kanban_column_id TEXT REFERENCES kanban_columns(id) ON DELETE SET NULL',
+  'ALTER TABLE notes ADD COLUMN kanban_position REAL',
+]) {
+  try { db.exec(ddl); } catch { /* column already exists */ }
+}
 
 export default db;

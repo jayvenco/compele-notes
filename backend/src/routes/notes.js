@@ -117,13 +117,15 @@ router.post('/', (req, res) => {
     pinned: body.pinned ? 1 : 0,
     archived: 0,
     tasks_json: JSON.stringify(body.tasks || []),
+    kanban_column_id: body.kanban_column_id || null,
+    kanban_position: body.kanban_position ?? null,
     created_at: now,
     updated_at: now,
   };
 
   db.prepare(
-    `INSERT INTO notes (id, user_id, title, content, type, category_id, color, due_date, pinned, archived, tasks_json, created_at, updated_at)
-     VALUES (@id, @user_id, @title, @content, @type, @category_id, @color, @due_date, @pinned, @archived, @tasks_json, @created_at, @updated_at)`
+    `INSERT INTO notes (id, user_id, title, content, type, category_id, color, due_date, pinned, archived, tasks_json, kanban_column_id, kanban_position, created_at, updated_at)
+     VALUES (@id, @user_id, @title, @content, @type, @category_id, @color, @due_date, @pinned, @archived, @tasks_json, @kanban_column_id, @kanban_position, @created_at, @updated_at)`
   ).run(note);
 
   if (Array.isArray(body.tag_ids)) setNoteTags(id, body.tag_ids);
