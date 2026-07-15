@@ -7,10 +7,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg'],
+      includeAssets: ['logo.png'],
       manifest: {
-        name: 'Notes',
-        short_name: 'Notes',
+        name: 'Compele Notes',
+        short_name: 'Compele',
         description: 'Local-first note-taking app',
         theme_color: '#2563eb',
         background_color: '#f9fafb',
@@ -18,21 +18,15 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: 'favicon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any',
-          },
-          {
-            src: 'favicon.svg',
+            src: 'logo.png',
             sizes: '512x512',
-            type: 'image/svg+xml',
-            purpose: 'maskable',
+            type: 'image/png',
+            purpose: 'any maskable',
           },
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/api/'),

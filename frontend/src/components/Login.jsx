@@ -39,12 +39,11 @@ export default function Login({ onLogin }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <div className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
-        <h1 className="text-2xl font-semibold text-center mb-1 text-gray-900 dark:text-gray-100">
-          📝 Notes
-        </h1>
-        <p className="text-sm text-center text-gray-500 dark:text-gray-400 mb-6">
-          Sign in with just your name — no password needed.
-        </p>
+        <div className="flex flex-col items-center mb-6">
+          <img src="/logo.png" alt="Compele Notes" className="w-20 h-20 rounded-2xl mb-3 shadow" />
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Compele Notes</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Sign in with just your name — no password needed.</p>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <input

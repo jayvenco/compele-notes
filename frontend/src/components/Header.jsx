@@ -8,7 +8,8 @@ export default function Header({ user, search, onSearchChange, onNewNote, onTogg
       >
         ☰
       </button>
-      <span className="font-semibold text-lg text-gray-900 dark:text-gray-100 shrink-0">📝 Notes</span>
+      <img src="/logo.png" alt="Compele Notes" className="h-8 w-8 rounded-lg shrink-0" />
+      <span className="font-semibold text-lg text-gray-900 dark:text-gray-100 shrink-0 hidden sm:block">Compele Notes</span>
 
       <div className="flex-1 max-w-md">
         <input
