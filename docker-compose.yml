@@ -44,7 +44,7 @@ services:
       backend:
         condition: service_healthy
     ports:
-      - "${NOTES_PORT:-8080}:80"
+      - "${NOTES_PORT:-3737}:80"
 
 volumes:
   notes-data:
