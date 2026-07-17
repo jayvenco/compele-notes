@@ -5,12 +5,12 @@
 # Installeren via terminal (Unraid of elke Docker host):
 #
 #   export GITHUB_USER=jouw-github-gebruikersnaam
-#   docker compose -f https://raw.githubusercontent.com/$GITHUB_USER/notes-app/main/docker-compose.yml up -d
+#   docker compose -f https://raw.githubusercontent.com/$GITHUB_USER/compele-notes/main/docker-compose.yml up -d
 #
 # Of download de compose en maak een .env aan (zie .env.example):
 #
-#   curl -O https://raw.githubusercontent.com/GITHUB_USER/notes-app/main/docker-compose.yml
-#   curl -O https://raw.githubusercontent.com/GITHUB_USER/notes-app/main/.env.example
+#   curl -O https://raw.githubusercontent.com/GITHUB_USER/compele-notes/main/docker-compose.yml
+#   curl -O https://raw.githubusercontent.com/GITHUB_USER/compele-notes/main/.env.example
 #   mv .env.example .env   # pas GITHUB_USER aan in .env
 #   docker compose up -d
 #
@@ -19,7 +19,7 @@
 
 services:
   backend:
-    image: ghcr.io/${GITHUB_USER}/notes-app-backend:${NOTES_TAG:-latest}
+    image: ghcr.io/${GITHUB_USER}/compele-notes-backend:${NOTES_TAG:-latest}
     restart: unless-stopped
     environment:
       - PORT=4000
@@ -38,7 +38,7 @@ services:
       start_period: 10s
 
   frontend:
-    image: ghcr.io/${GITHUB_USER}/notes-app-frontend:${NOTES_TAG:-latest}
+    image: ghcr.io/${GITHUB_USER}/compele-notes-frontend:${NOTES_TAG:-latest}
     restart: unless-stopped
     depends_on:
       backend:
