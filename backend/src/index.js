@@ -5,7 +5,7 @@ import path from 'path';
 import { UPLOADS_DIR } from './db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PUBLIC_DIR = path.join(__dirname, '../../public');
+const PUBLIC_DIR = path.join(__dirname, '../public');
 
 import usersRouter from './routes/users.js';
 import categoriesRouter from './routes/categories.js';
