@@ -72,3 +72,57 @@ mark.search-highlight {
   break-inside: avoid;
   margin-bottom: 1rem;
 }
+
+/* ── Kleurthema's ─────────────────────────────────────────────────────── */
+
+html[data-colortheme] body      { background-color: var(--ct-bg) !important; }
+html[data-colortheme] header    { background-color: var(--ct-surface) !important; border-color: var(--ct-border) !important; }
+html[data-colortheme] aside     { background-color: var(--ct-surface) !important; border-color: var(--ct-border) !important; }
+html[data-colortheme] .bg-white { background-color: var(--ct-surface) !important; }
+html[data-colortheme] .bg-gray-50, html[data-colortheme] .bg-gray-100 { background-color: var(--ct-bg) !important; }
+html[data-colortheme] .bg-gray-800 { background-color: var(--ct-surface) !important; }
+html[data-colortheme] .bg-gray-700 { background-color: var(--ct-surface2) !important; }
+html[data-colortheme] .bg-blue-600, html[data-colortheme] .hover\:bg-blue-700:hover { background-color: var(--ct-accent) !important; }
+html[data-colortheme] .text-gray-900, html[data-colortheme] .dark\:text-gray-100 { color: var(--ct-text) !important; }
+html[data-colortheme] .text-gray-700, html[data-colortheme] .dark\:text-gray-200 { color: var(--ct-muted) !important; }
+html[data-colortheme] .border-gray-200, html[data-colortheme] .dark\:border-gray-700 { border-color: var(--ct-border) !important; }
+html[data-colortheme] .border-gray-300, html[data-colortheme] .dark\:border-gray-600 { border-color: var(--ct-border) !important; }
+html[data-colortheme] .focus\:ring-blue-500:focus { --tw-ring-color: var(--ct-accent) !important; }
+html[data-colortheme] .text-blue-500, html[data-colortheme] .text-blue-600 { color: var(--ct-accent) !important; }
+html[data-colortheme] input, html[data-colortheme] select { background-color: var(--ct-surface2) !important; color: var(--ct-text) !important; border-color: var(--ct-border) !important; }
+
+/* Zwart-Oranje */
+html[data-colortheme="black-orange"] {
+  --ct-bg: #000000; --ct-surface: #111111; --ct-surface2: #1a1a1a;
+  --ct-text: #f0ebe3; --ct-muted: #999999; --ct-accent: #f77f00; --ct-border: #2a2a2a;
+}
+/* Neon */
+html[data-colortheme="neon"] {
+  --ct-bg: #050510; --ct-surface: #0d0d1f; --ct-surface2: #141428;
+  --ct-text: #e0e0ff; --ct-muted: #7070cc; --ct-accent: #00ffcc; --ct-border: #1e1e3a;
+}
+/* YouTube */
+html[data-colortheme="youtube"] {
+  --ct-bg: #f9f9f9; --ct-surface: #ffffff; --ct-surface2: #f2f2f2;
+  --ct-text: #0f0f0f; --ct-muted: #606060; --ct-accent: #ff0000; --ct-border: #e5e5e5;
+}
+/* GitHub */
+html[data-colortheme="github"] {
+  --ct-bg: #0d1117; --ct-surface: #161b22; --ct-surface2: #21262d;
+  --ct-text: #e6edf3; --ct-muted: #8b949e; --ct-accent: #238636; --ct-border: #30363d;
+}
+/* Blauw Terminal */
+html[data-colortheme="blue-terminal"] {
+  --ct-bg: #000814; --ct-surface: #001233; --ct-surface2: #002166;
+  --ct-text: #90e0ef; --ct-muted: #4a8fa8; --ct-accent: #00b4d8; --ct-border: #023e8a;
+}
+/* Zwart-Groen */
+html[data-colortheme="black-green"] {
+  --ct-bg: #000000; --ct-surface: #001a00; --ct-surface2: #003300;
+  --ct-text: #00ff41; --ct-muted: #00aa2a; --ct-accent: #00ff41; --ct-border: #005500;
+}
+/* Aarde */
+html[data-colortheme="earth"] {
+  --ct-bg: #2c1a0e; --ct-surface: #3d2512; --ct-surface2: #4e3019;
+  --ct-text: #f0e6d3; --ct-muted: #a8876a; --ct-accent: #c17d3c; --ct-border: #5e3a1f;
+}

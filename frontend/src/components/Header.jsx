@@ -1,4 +1,4 @@
-export default function Header({ user, search, onSearchChange, onNewNote, onToggleSidebar, onSwitchUser, theme, onToggleTheme, view, onViewChange, onOpenSettings }) {
+export default function Header({ user, search, onSearchChange, onNewNote, onToggleSidebar, onSwitchUser, theme, onToggleTheme, view, onViewChange, onOpenSettings, onTogglePomodoro, pomodoroActive, todayCount }) {
   return (
     <header className="sticky top-0 z-30 flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
       <button
@@ -45,6 +45,24 @@ export default function Header({ user, search, onSearchChange, onNewNote, onTogg
       >
         + Nieuwe notitie
       </button>
+
+      <button
+        onClick={onTogglePomodoro}
+        title="Pomodoro timer"
+        className={`relative px-1 shrink-0 text-base ${pomodoroActive ? 'text-red-500' : 'text-gray-600 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white'}`}
+      >
+        🍅
+        {pomodoroActive && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />}
+      </button>
+
+      {todayCount > 0 && (
+        <span
+          title={`${todayCount} taak${todayCount !== 1 ? 'en' : ''} vandaag`}
+          className="shrink-0 text-xs font-bold px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-300 cursor-default"
+        >
+          📅 {todayCount}
+        </span>
+      )}
 
       <button
         onClick={onOpenSettings}

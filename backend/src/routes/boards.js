@@ -23,6 +23,10 @@ function getBoard(boardId, userId) {
     .prepare('SELECT * FROM kanban_columns WHERE board_id = ? ORDER BY position')
     .all(boardId);
 
+  const lanes = db
+    .prepare('SELECT * FROM kanban_lanes WHERE board_id = ? ORDER BY position')
+    .all(boardId);
+
   const columnIds = columns.map((c) => c.id);
   const notes =
     columnIds.length > 0
@@ -39,30 +43,20 @@ function getBoard(boardId, userId) {
           .all(...columnIds)
       : [];
 
-  const notesByColumn = {};
+  const cells = {}; // cells[laneId|'none'][colId] = [notes]
   for (const n of notes) {
     const tags = n.tag_list
-      ? n.tag_list.split(',').map((s) => {
-          const [id, name] = s.split('::');
-          return { id, name };
-        })
+      ? n.tag_list.split(',').map((s) => { const [id, name] = s.split('::'); return { id, name }; })
       : [];
-    const note = {
-      ...n,
-      pinned: !!n.pinned,
-      archived: !!n.archived,
-      tasks: JSON.parse(n.tasks_json || '[]'),
-      tags,
-    };
+    const note = { ...n, pinned: !!n.pinned, archived: !!n.archived, tasks: JSON.parse(n.tasks_json || '[]'), tags };
     delete note.tag_list;
-    if (!notesByColumn[n.kanban_column_id]) notesByColumn[n.kanban_column_id] = [];
-    notesByColumn[n.kanban_column_id].push(note);
+    const laneKey = n.kanban_lane_id || 'none';
+    if (!cells[laneKey]) cells[laneKey] = {};
+    if (!cells[laneKey][n.kanban_column_id]) cells[laneKey][n.kanban_column_id] = [];
+    cells[laneKey][n.kanban_column_id].push(note);
   }
 
-  return {
-    ...board,
-    columns: columns.map((c) => ({ ...c, notes: notesByColumn[c.id] || [] })),
-  };
+  return { ...board, columns, lanes, cells };
 }
 
 // List boards
@@ -173,28 +167,49 @@ router.delete('/:id/columns/:colId', (req, res) => {
   res.status(204).end();
 });
 
-// Move a note to a column (or remove from board)
+// Move a note to a column + optional lane
 router.patch('/:id/move', (req, res) => {
-  const { note_id, column_id, position } = req.body || {};
+  const { note_id, column_id, lane_id, position } = req.body || {};
   if (!note_id) return res.status(400).json({ error: 'note_id required' });
 
-  const note = db
-    .prepare('SELECT id FROM notes WHERE id = ? AND user_id = ?')
-    .get(note_id, req.userId);
+  const note = db.prepare('SELECT id FROM notes WHERE id = ? AND user_id = ?').get(note_id, req.userId);
   if (!note) return res.status(404).json({ error: 'Note not found' });
 
   if (column_id) {
-    const col = db
-      .prepare('SELECT id FROM kanban_columns WHERE id = ? AND board_id = ?')
-      .get(column_id, req.params.id);
+    const col = db.prepare('SELECT id FROM kanban_columns WHERE id = ? AND board_id = ?').get(column_id, req.params.id);
     if (!col) return res.status(404).json({ error: 'Column not found' });
   }
 
   db.prepare(
-    'UPDATE notes SET kanban_column_id = ?, kanban_position = ?, updated_at = ? WHERE id = ?'
-  ).run(column_id || null, position ?? null, new Date().toISOString(), note_id);
+    'UPDATE notes SET kanban_column_id = ?, kanban_lane_id = ?, kanban_position = ?, updated_at = ? WHERE id = ?'
+  ).run(column_id || null, lane_id || null, position ?? null, new Date().toISOString(), note_id);
 
   res.json({ ok: true });
+});
+
+// Lane routes
+router.post('/:id/lanes', (req, res) => {
+  const board = db.prepare('SELECT id FROM kanban_boards WHERE id = ? AND user_id = ?').get(req.params.id, req.userId);
+  if (!board) return res.status(404).json({ error: 'Board not found' });
+  const name = (req.body?.name || 'New Lane').trim();
+  const maxPos = db.prepare('SELECT MAX(position) as m FROM kanban_lanes WHERE board_id = ?').get(req.params.id)?.m ?? -1;
+  const id = uuid();
+  const now = new Date().toISOString();
+  db.prepare('INSERT INTO kanban_lanes (id, board_id, name, position, created_at) VALUES (?, ?, ?, ?, ?)').run(id, req.params.id, name, maxPos + 1, now);
+  res.status(201).json({ id, board_id: req.params.id, name, position: maxPos + 1 });
+});
+
+router.put('/:id/lanes/:laneId', (req, res) => {
+  const name = (req.body?.name || '').trim();
+  if (!name) return res.status(400).json({ error: 'Name required' });
+  db.prepare('UPDATE kanban_lanes SET name = ? WHERE id = ? AND board_id = ?').run(name, req.params.laneId, req.params.id);
+  res.json({ id: req.params.laneId, name });
+});
+
+router.delete('/:id/lanes/:laneId', (req, res) => {
+  db.prepare('UPDATE notes SET kanban_lane_id = NULL WHERE kanban_lane_id = ?').run(req.params.laneId);
+  db.prepare('DELETE FROM kanban_lanes WHERE id = ? AND board_id = ?').run(req.params.laneId, req.params.id);
+  res.status(204).end();
 });
 
 export default router;

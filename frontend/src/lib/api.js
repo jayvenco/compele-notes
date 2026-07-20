@@ -81,11 +81,17 @@ export const api = {
     request(`/boards/${boardId}/columns/${colId}`, { method: 'PUT', body: JSON.stringify(patch) }),
   deleteColumn: (boardId, colId) =>
     request(`/boards/${boardId}/columns/${colId}`, { method: 'DELETE' }),
-  moveCard: (boardId, note_id, column_id, position) =>
+  moveCard: (boardId, note_id, column_id, lane_id, position) =>
     request(`/boards/${boardId}/move`, {
       method: 'PATCH',
-      body: JSON.stringify({ note_id, column_id, position }),
+      body: JSON.stringify({ note_id, column_id, lane_id, position }),
     }),
+  addLane: (boardId, name) =>
+    request(`/boards/${boardId}/lanes`, { method: 'POST', body: JSON.stringify({ name }) }),
+  updateLane: (boardId, laneId, name) =>
+    request(`/boards/${boardId}/lanes/${laneId}`, { method: 'PUT', body: JSON.stringify({ name }) }),
+  deleteLane: (boardId, laneId) =>
+    request(`/boards/${boardId}/lanes/${laneId}`, { method: 'DELETE' }),
 
   // API keys
   listApiKeys: () => request('/keys'),

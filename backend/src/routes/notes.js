@@ -72,6 +72,9 @@ router.get('/', (req, res) => {
     where.push('n.color = ?');
     params.push(color);
   }
+  if (req.query.due_today === 'true') {
+    where.push(`n.type = 'task' AND date(n.due_date) = date('now', 'localtime')`);
+  }
   if (completed === 'true') {
     where.push(`n.type = 'task' AND json_array_length(n.tasks_json) > 0 AND NOT EXISTS (
       SELECT 1 FROM json_each(n.tasks_json) je WHERE json_extract(je.value, '$.done') = 0

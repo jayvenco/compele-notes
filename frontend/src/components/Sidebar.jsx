@@ -100,6 +100,17 @@ export default function Sidebar({
       } fixed lg:sticky top-[57px] lg:top-0 left-0 z-20 h-[calc(100vh-57px)] lg:h-screen w-64 shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto transition-transform`}
     >
       <Section title="Filters">
+        <button
+          onClick={() => onFilterChange({ due_today: filters.due_today ? '' : 'true', type: filters.due_today ? '' : 'task' })}
+          className={`w-full mb-2 text-sm px-2 py-1.5 rounded-lg text-left font-medium flex items-center gap-2 ${
+            filters.due_today === 'true'
+              ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300'
+              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+          }`}
+        >
+          📅 Vandaag
+        </button>
+
         <select
           value={filters.type || ''}
           onChange={(e) => onFilterChange({ type: e.target.value })}

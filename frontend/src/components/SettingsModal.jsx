@@ -1,7 +1,18 @@
 import { useState } from 'react';
 import { api } from '../lib/api.js';
 
-export default function SettingsModal({ categories, onCategoriesChanged, onClose }) {
+const THEMES = [
+  { id: '', label: 'Standaard' },
+  { id: 'black-orange', label: 'Zwart-Oranje', accent: '#f77f00', bg: '#000' },
+  { id: 'neon', label: 'Neon', accent: '#00ffcc', bg: '#050510' },
+  { id: 'youtube', label: 'YouTube', accent: '#ff0000', bg: '#f9f9f9' },
+  { id: 'github', label: 'GitHub', accent: '#238636', bg: '#0d1117' },
+  { id: 'blue-terminal', label: 'Blauw Terminal', accent: '#00b4d8', bg: '#000814' },
+  { id: 'black-green', label: 'Zwart-Groen', accent: '#00ff41', bg: '#000' },
+  { id: 'earth', label: 'Aarde', accent: '#c17d3c', bg: '#2c1a0e' },
+];
+
+export default function SettingsModal({ categories, onCategoriesChanged, colorTheme, onColorThemeChange, onClose }) {
   const [newName, setNewName] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editingName, setEditingName] = useState('');
@@ -103,7 +114,30 @@ export default function SettingsModal({ categories, onCategoriesChanged, onClose
             ))}
           </ul>
 
-          {/* Add new */}
+          {/* Theme picker */}
+          <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mt-5 mb-3">Kleurthema</p>
+          <div className="grid grid-cols-4 gap-2 mb-4">
+            {THEMES.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => onColorThemeChange(t.id)}
+                title={t.label}
+                className={`flex flex-col items-center gap-1 p-2 rounded-xl border-2 transition-all ${
+                  colorTheme === t.id ? 'border-blue-500' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600'
+                }`}
+              >
+                <span
+                  className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center"
+                  style={{ background: t.bg || '#f9fafb' }}
+                >
+                  {t.accent && <span className="w-3 h-3 rounded-full" style={{ background: t.accent }} />}
+                </span>
+                <span className="text-xs text-gray-600 dark:text-gray-300 text-center leading-tight">{t.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Add new category */}
           <div className="flex gap-2">
             <input
               type="text"

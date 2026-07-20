@@ -101,12 +101,23 @@ CREATE TABLE IF NOT EXISTS api_keys (
 );
 
 CREATE INDEX IF NOT EXISTS idx_apikeys_hash ON api_keys(key_hash);
+
+CREATE TABLE IF NOT EXISTS kanban_lanes (
+  id TEXT PRIMARY KEY,
+  board_id TEXT NOT NULL REFERENCES kanban_boards(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  position REAL NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_lanes_board ON kanban_lanes(board_id);
 `);
 
-// Lightweight migrations: add columns to notes for kanban if not present yet
+// Lightweight migrations
 for (const ddl of [
   'ALTER TABLE notes ADD COLUMN kanban_column_id TEXT REFERENCES kanban_columns(id) ON DELETE SET NULL',
   'ALTER TABLE notes ADD COLUMN kanban_position REAL',
+  'ALTER TABLE notes ADD COLUMN kanban_lane_id TEXT REFERENCES kanban_lanes(id) ON DELETE SET NULL',
 ]) {
   try { db.exec(ddl); } catch { /* column already exists */ }
 }
