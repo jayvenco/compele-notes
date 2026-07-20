@@ -18,5 +18,8 @@ export default {
       },
     },
   },
+  safelist: [
+    { pattern: /^bg-note-(yellow|blue|green|red|purple|orange|pink|gray)-(light|dark)$/ },
+  ],
   plugins: [],
 };
