@@ -1,15 +1,7 @@
-# Override voor lokaal bouwen vanuit broncode (development):
+# Override voor lokaal bouwen vanuit broncode:
 #
 #   docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
-#
-# Of als je wil builden en pushen naar GHCR:
-#
-#   docker compose -f docker-compose.yml -f docker-compose.build.yml build
-#   docker compose -f docker-compose.yml -f docker-compose.build.yml push
 
 services:
-  backend:
-    build: ./backend
-
-  frontend:
-    build: ./frontend
+  app:
+    build: .

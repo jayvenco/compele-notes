@@ -1,6 +1,11 @@
 import express from 'express';
 import cors from 'cors';
+import { fileURLToPath } from 'url';
+import path from 'path';
 import { UPLOADS_DIR } from './db.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PUBLIC_DIR = path.join(__dirname, '../../public');
 
 import usersRouter from './routes/users.js';
 import categoriesRouter from './routes/categories.js';
@@ -30,11 +35,14 @@ app.use('/api/settings', settingsRouter);
 app.use('/api/boards', boardsRouter);
 app.use('/api/keys', apikeysRouter);
 
+app.use(express.static(PUBLIC_DIR));
+app.get('*', (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'index.html')));
+
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ error: err.message || 'Internal server error' });
 });
 
 app.listen(PORT, () => {
-  console.log(`Notes API listening on port ${PORT}`);
+  console.log(`Compele Notes listening on port ${PORT}`);
 });

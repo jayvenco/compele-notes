@@ -1,4 +1,4 @@
-name: Build & push Docker images
+name: Build & push Docker image
 
 on:
   push:
@@ -14,15 +14,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - service: backend
-            context: ./backend
-          - service: frontend
-            context: ./frontend
 
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +35,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/compele-notes-${{ matrix.service }}
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/compele-notes
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,prefix=sha-
@@ -52,7 +43,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.context }}
+          context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
