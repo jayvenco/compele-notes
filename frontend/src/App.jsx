@@ -6,6 +6,7 @@ import Sidebar from './components/Sidebar.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import KanbanBoard from './components/KanbanBoard.jsx';
 import NoteEditorModal from './components/NoteEditorModal.jsx';
+import SettingsModal from './components/SettingsModal.jsx';
 import OfflineBanner from './components/OfflineBanner.jsx';
 import { useOnline } from './lib/useOnline.js';
 
@@ -30,6 +31,7 @@ export default function App() {
   const [view, setView] = useState(() => localStorage.getItem('notes.view') || 'grid');
   const [editingNoteId, setEditingNoteId] = useState(undefined);
   const [newNoteColumnId, setNewNoteColumnId] = useState(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const online = useOnline();
 
@@ -99,6 +101,7 @@ export default function App() {
         onToggleTheme={toggleTheme}
         view={view}
         onViewChange={handleViewChange}
+        onOpenSettings={() => setSettingsOpen(true)}
       />
 
       <div className="flex">
@@ -137,6 +140,14 @@ export default function App() {
       >
         +
       </button>
+
+      {settingsOpen && (
+        <SettingsModal
+          categories={categories}
+          onCategoriesChanged={refreshCategories}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
 
       {editingNoteId !== undefined && (
         <NoteEditorModal

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { api } from '../lib/api.js';
 import NoteCard from './NoteCard.jsx';
 
+
 const PAGE_SIZE = 20;
 
 export default function Dashboard({ filters, categories, onOpenNote, refreshKey }) {
@@ -11,6 +12,11 @@ export default function Dashboard({ filters, categories, onOpenNote, refreshKey 
   const [loading, setLoading] = useState(false);
   const sentinelRef = useRef(null);
   const categoryMap = Object.fromEntries(categories.map((c) => [c.id, c.name]));
+
+  async function handleColorChange(noteId, color) {
+    setNotes((prev) => prev.map((n) => (n.id === noteId ? { ...n, color } : n)));
+    await api.updateNote(noteId, { color });
+  }
 
   const loadPage = useCallback(
     async (pageToLoad, replace) => {
@@ -70,6 +76,7 @@ export default function Dashboard({ filters, categories, onOpenNote, refreshKey 
             categoryName={categoryMap[note.category_id]}
             searchTerm={filters.search}
             onClick={() => onOpenNote(note.id)}
+            onColorChange={handleColorChange}
           />
         ))}
       </div>

@@ -1,4 +1,4 @@
-export default function Header({ user, search, onSearchChange, onNewNote, onToggleSidebar, onSwitchUser, theme, onToggleTheme, view, onViewChange }) {
+export default function Header({ user, search, onSearchChange, onNewNote, onToggleSidebar, onSwitchUser, theme, onToggleTheme, view, onViewChange, onOpenSettings }) {
   return (
     <header className="sticky top-0 z-30 flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
       <button
@@ -44,6 +44,14 @@ export default function Header({ user, search, onSearchChange, onNewNote, onTogg
         className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-3 py-1.5 shrink-0"
       >
         + Nieuwe notitie
+      </button>
+
+      <button
+        onClick={onOpenSettings}
+        title="Instellingen"
+        className="text-gray-600 dark:text-gray-200 px-1 shrink-0 hover:text-gray-900 dark:hover:text-white"
+      >
+        ⚙
       </button>
 
       <button
