@@ -37,22 +37,22 @@ export default function KanbanCard({ note, onOpen }) {
         className="w-full text-left p-3 pt-4 focus:outline-none"
       >
         <div className="flex items-start justify-between gap-1 mb-1">
-          <p className="font-medium text-sm text-gray-900 dark:text-gray-50 line-clamp-2 break-words">
+          <p className="font-medium text-sm text-gray-900 dark:text-white line-clamp-2 break-words">
             {note.title || 'Untitled'}
           </p>
-          <span className="text-xs shrink-0 px-1 rounded bg-black/10 dark:bg-white/10 text-gray-600 dark:text-gray-300">
+          <span className="text-xs shrink-0 px-1 rounded bg-black/10 dark:bg-white/20 text-gray-600 dark:text-white">
             {note.type === 'task' ? '✓' : '📝'}
           </span>
         </div>
 
         {snippet && (
-          <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 mb-1.5">
+          <p className="text-xs text-gray-600 dark:text-gray-100 line-clamp-2 mb-1.5">
             {snippet}
           </p>
         )}
 
         {progress && progress.total > 0 && (
-          <div className="h-1 w-full bg-black/10 dark:bg-white/10 rounded-full overflow-hidden mb-1.5">
+          <div className="h-1 w-full bg-black/10 dark:bg-white/20 rounded-full overflow-hidden mb-1.5">
             <div className="h-full bg-green-500" style={{ width: `${progress.pct}%` }} />
           </div>
         )}
@@ -62,7 +62,7 @@ export default function KanbanCard({ note, onOpen }) {
             {note.tags.slice(0, 3).map((t) => (
               <span
                 key={t.id}
-                className="text-xs px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/5 text-gray-600 dark:text-gray-300"
+                className="text-xs px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 text-gray-600 dark:text-gray-100"
               >
                 #{t.name}
               </span>
