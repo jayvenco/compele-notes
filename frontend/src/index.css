@@ -45,29 +45,31 @@ mark.search-highlight {
   border-radius: 2px;
 }
 
-.notes-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(2, 1fr);
+.masonry-columns {
+  column-count: 1;
+  column-gap: 1rem;
 }
 
 @media (min-width: 640px) {
-  .notes-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  .masonry-columns { column-count: 2; }
 }
-
 @media (min-width: 1024px) {
-  .notes-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  .masonry-columns { column-count: 3; }
+}
+@media (min-width: 1280px) {
+  .masonry-columns { column-count: 4; }
 }
 
-@media (min-width: 1280px) {
-  .notes-grid {
-    grid-template-columns: repeat(5, 1fr);
-  }
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 1rem;
 }
+
+/* ── Lettertype-thema's ───────────────────────────────────────────────────── */
+html[data-font="open-sans"]  { font-family: 'Open Sans', sans-serif; }
+html[data-font="roboto"]     { font-family: 'Roboto', sans-serif; }
+html[data-font="fira-code"]  { font-family: 'Fira Code', monospace; }
+html[data-font="playfair"]   { font-family: 'Playfair Display', serif; }
 
 /* ── Kleurthema's ─────────────────────────────────────────────────────── */
 

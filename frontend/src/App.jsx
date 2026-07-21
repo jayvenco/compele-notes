@@ -20,6 +20,18 @@ function useTheme() {
   return [theme, () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))];
 }
 
+function useFont() {
+  const [font, setFont] = useState(() => localStorage.getItem('notes.font') || '');
+  function apply(id) {
+    if (id) document.documentElement.setAttribute('data-font', id);
+    else document.documentElement.removeAttribute('data-font');
+    localStorage.setItem('notes.font', id);
+    setFont(id);
+  }
+  useEffect(() => { apply(font); }, []);
+  return [font, apply];
+}
+
 function useColorTheme() {
   const [colorTheme, setColorTheme] = useState(() => localStorage.getItem('notes.colorTheme') || '');
   function apply(id) {
@@ -37,6 +49,7 @@ export default function App() {
   const [bootstrapped, setBootstrapped] = useState(false);
   const [theme, toggleTheme] = useTheme();
   const [colorTheme, setColorTheme] = useColorTheme();
+  const [font, setFont] = useFont();
   const [pomodoroOpen, setPomodoroOpen] = useState(false);
   const [todayCount, setTodayCount] = useState(0);
 
@@ -175,6 +188,8 @@ export default function App() {
           onCategoriesChanged={refreshCategories}
           colorTheme={colorTheme}
           onColorThemeChange={setColorTheme}
+          font={font}
+          onFontChange={setFont}
           onClose={() => setSettingsOpen(false)}
         />
       )}

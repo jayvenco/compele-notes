@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { api } from '../lib/api.js';
 
+const FONTS = [
+  { id: '', label: 'Standaard', sample: 'Aa', style: {} },
+  { id: 'open-sans', label: 'Open Sans', sample: 'Aa', style: { fontFamily: "'Open Sans', sans-serif" } },
+  { id: 'roboto', label: 'Roboto', sample: 'Aa', style: { fontFamily: "'Roboto', sans-serif" } },
+  { id: 'fira-code', label: 'Console', sample: 'Aa', style: { fontFamily: "'Fira Code', monospace" } },
+  { id: 'playfair', label: 'Playfair', sample: 'Aa', style: { fontFamily: "'Playfair Display', serif" } },
+];
+
 const THEMES = [
   { id: '', label: 'Standaard' },
   { id: 'black-orange', label: 'Zwart-Oranje', accent: '#f77f00', bg: '#000' },
@@ -12,7 +20,7 @@ const THEMES = [
   { id: 'earth', label: 'Aarde', accent: '#c17d3c', bg: '#2c1a0e' },
 ];
 
-export default function SettingsModal({ categories, onCategoriesChanged, colorTheme, onColorThemeChange, onClose }) {
+export default function SettingsModal({ categories, onCategoriesChanged, colorTheme, onColorThemeChange, font, onFontChange, onClose }) {
   const [newName, setNewName] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editingName, setEditingName] = useState('');
@@ -114,8 +122,31 @@ export default function SettingsModal({ categories, onCategoriesChanged, colorTh
             ))}
           </ul>
 
+          {/* Font picker */}
+          <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mt-5 mb-3">Lettertype</p>
+          <div className="grid grid-cols-5 gap-2 mb-5">
+            {FONTS.map((f) => (
+              <button
+                key={f.id}
+                onClick={() => onFontChange(f.id)}
+                title={f.label}
+                className={`flex flex-col items-center gap-1 p-2 rounded-xl border-2 transition-all ${
+                  font === f.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600'
+                }`}
+              >
+                <span
+                  className="text-lg font-semibold text-gray-800 dark:text-gray-100"
+                  style={f.style}
+                >
+                  {f.sample}
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 text-center leading-tight">{f.label}</span>
+              </button>
+            ))}
+          </div>
+
           {/* Theme picker */}
-          <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mt-5 mb-3">Kleurthema</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mt-1 mb-3">Kleurthema</p>
           <div className="grid grid-cols-4 gap-2 mb-4">
             {THEMES.map((t) => (
               <button
