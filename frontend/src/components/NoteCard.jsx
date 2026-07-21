@@ -37,12 +37,15 @@ function ColorPicker({ current, onChange }) {
   );
 }
 
-export default function NoteCard({ note, categoryName, onClick, onColorChange, searchTerm }) {
+export default function NoteCard({ note, categoryName, onClick, onColorChange, searchTerm, index = 0 }) {
   const snippet = stripHtml(note.content).slice(0, 180);
   const progress = note.type === 'task' ? taskProgress(note.tasks) : null;
 
   return (
-    <div className={`masonry-item group relative w-full rounded-xl shadow-sm hover:shadow-md transition-shadow border border-black/5 dark:border-white/10 ${colorClasses(note.color)}`}>
+    <div
+      className={`masonry-item card-animate group relative w-full rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 border border-black/5 dark:border-white/10 ${colorClasses(note.color)}`}
+      style={{ animationDelay: `${Math.min(index * 35, 350)}ms` }}
+    >
       <button onClick={onClick} className="w-full text-left p-4">
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 break-words">

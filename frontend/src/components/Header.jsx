@@ -1,92 +1,89 @@
-export default function Header({ user, search, onSearchChange, onNewNote, onToggleSidebar, onSwitchUser, theme, onToggleTheme, view, onViewChange, onOpenSettings, onTogglePomodoro, pomodoroActive, todayCount }) {
+import { useEffect, useRef, useState } from 'react';
+
+export default function Header({ search, onSearchChange, onToggleSidebar }) {
+  const inputRef = useRef(null);
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    function onKey(e) {
+      const isMac = navigator.userAgent.includes('Mac');
+      if ((isMac ? e.metaKey : e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+      if (e.key === 'Escape' && document.activeElement === inputRef.current) {
+        inputRef.current?.blur();
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-30 flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+    <header
+      className="sticky top-0 z-30 flex h-16 items-center gap-4 px-5 border-b shrink-0"
+      style={{
+        background: 'color-mix(in srgb, var(--an-bg) 70%, transparent)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderColor: 'var(--an-border)',
+      }}
+    >
+      {/* Mobile sidebar toggle */}
       <button
         onClick={onToggleSidebar}
-        className="lg:hidden text-gray-600 dark:text-gray-200 px-1"
-        title="Toggle sidebar"
+        className="lg:hidden p-2 rounded-xl transition-colors shrink-0"
+        style={{ color: 'var(--an-muted)' }}
+        title="Zijbalk"
       >
-        ☰
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
       </button>
-      <img src="/logo.png" alt="Compele Notes" className="h-8 w-8 rounded-lg shrink-0" />
-      <span className="font-semibold text-lg text-gray-900 dark:text-gray-100 shrink-0 hidden sm:block">Compele Notes</span>
 
-      <div className="flex-1 max-w-md">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Zoek notities, tags, categorieën…"
-          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+      {/* Search — centered */}
+      <div className="flex-1 max-w-2xl mx-auto">
+        <div
+          className="flex items-center gap-3 h-10 rounded-xl border px-4 transition-all duration-200"
+          style={{
+            background: 'var(--an-card)',
+            borderColor: focused ? 'var(--an-accent)' : 'var(--an-border)',
+            boxShadow: focused ? '0 0 0 3px color-mix(in srgb, var(--an-accent) 18%, transparent)' : 'none',
+          }}
+        >
+          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"
+            style={{ color: 'var(--an-muted)' }}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 1 0 6.5 6.5a7.5 7.5 0 0 0 10.15 10.15z" />
+          </svg>
+          <input
+            ref={inputRef}
+            type="text"
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            placeholder="Zoek notities…"
+            className="flex-1 bg-transparent outline-none text-sm"
+            style={{ color: 'var(--an-fg)' }}
+          />
+          {search ? (
+            <button
+              onClick={() => onSearchChange('')}
+              className="text-sm shrink-0 hover:opacity-70 transition-opacity"
+              style={{ color: 'var(--an-muted)' }}
+            >
+              ✕
+            </button>
+          ) : (
+            <span
+              className="hidden sm:inline-flex items-center text-xs shrink-0 px-1.5 py-0.5 rounded-md border font-mono"
+              style={{ color: 'var(--an-muted)', borderColor: 'var(--an-border)', background: 'var(--an-sidebar-acc)' }}
+            >
+              ⌘K
+            </span>
+          )}
+        </div>
       </div>
-
-      {/* View toggle */}
-      <div className="flex rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 shrink-0">
-        <button
-          onClick={() => onViewChange('grid')}
-          title="Grid-weergave"
-          className={`px-2.5 py-1.5 text-sm ${view === 'grid' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
-        >
-          ⊞
-        </button>
-        <button
-          onClick={() => onViewChange('kanban')}
-          title="Kanban-weergave"
-          className={`px-2.5 py-1.5 text-sm ${view === 'kanban' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
-        >
-          ⬛⬛
-        </button>
-      </div>
-
-      <button
-        onClick={onNewNote}
-        className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-3 py-1.5 shrink-0"
-      >
-        + Nieuwe notitie
-      </button>
-
-      <button
-        onClick={onTogglePomodoro}
-        title="Pomodoro timer"
-        className={`relative px-1 shrink-0 text-base ${pomodoroActive ? 'text-red-500' : 'text-gray-600 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white'}`}
-      >
-        🍅
-        {pomodoroActive && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />}
-      </button>
-
-      {todayCount > 0 && (
-        <span
-          title={`${todayCount} taak${todayCount !== 1 ? 'en' : ''} vandaag`}
-          className="shrink-0 text-xs font-bold px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-300 cursor-default"
-        >
-          📅 {todayCount}
-        </span>
-      )}
-
-      <button
-        onClick={onOpenSettings}
-        title="Instellingen"
-        className="text-gray-600 dark:text-gray-200 px-1 shrink-0 hover:text-gray-900 dark:hover:text-white"
-      >
-        ⚙
-      </button>
-
-      <button
-        onClick={onToggleTheme}
-        title="Donkere modus"
-        className="text-gray-600 dark:text-gray-200 px-1 shrink-0"
-      >
-        {theme === 'dark' ? '🌙' : '☀️'}
-      </button>
-
-      <button
-        onClick={onSwitchUser}
-        title="Wissel gebruiker"
-        className="text-sm text-gray-600 dark:text-gray-200 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 shrink-0"
-      >
-        👤 {user.name}
-      </button>
     </header>
   );
 }

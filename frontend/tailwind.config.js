@@ -5,6 +5,7 @@ export default {
   theme: {
     extend: {
       colors: {
+        accent: '#ef8354',
         note: {
           yellow: { light: '#fef9c3', dark: '#854d0e' },
           blue: { light: '#dbeafe', dark: '#1e40af' },

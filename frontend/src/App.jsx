@@ -56,7 +56,7 @@ export default function App() {
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
   const [filters, setFilters] = useState({ category: '', tag: '', type: '', color: '', completed: '', search: '', due_today: '' });
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [view, setView] = useState(() => localStorage.getItem('notes.view') || 'grid');
   const [editingNoteId, setEditingNoteId] = useState(undefined);
   const [newNoteColumnId, setNewNoteColumnId] = useState(null);
@@ -91,9 +91,7 @@ export default function App() {
 
   function refreshCategories() { api.listCategories().then(setCategories); }
   function refreshTags() { api.listTags().then(setTags); }
-
   function updateFilters(patch) { setFilters((prev) => ({ ...prev, ...patch })); }
-
   function handleSwitchUser() { clearCurrentUserId(); setUser(null); }
 
   function handleViewChange(v) {
@@ -124,37 +122,40 @@ export default function App() {
   if (!user) return <Login onLogin={setUser} />;
 
   return (
-    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${online ? '' : 'pt-9'}`}>
+    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--an-bg)', color: 'var(--an-fg)' }}>
       {!online && <OfflineBanner />}
-      <Header
+
+      <Sidebar
+        collapsed={sidebarCollapsed}
+        onToggle={() => setSidebarCollapsed((v) => !v)}
         user={user}
-        search={filters.search}
-        onSearchChange={(search) => updateFilters({ search })}
-        onNewNote={() => handleNewNote()}
-        onToggleSidebar={() => setSidebarOpen((o) => !o)}
         onSwitchUser={handleSwitchUser}
-        theme={theme}
-        onToggleTheme={toggleTheme}
+        categories={categories}
+        tags={tags}
+        filters={filters}
+        onFilterChange={updateFilters}
         view={view}
         onViewChange={handleViewChange}
+        onNewNote={() => handleNewNote()}
+        theme={theme}
+        onToggleTheme={toggleTheme}
         onOpenSettings={() => setSettingsOpen(true)}
         onTogglePomodoro={() => setPomodoroOpen((o) => !o)}
         pomodoroActive={pomodoroOpen}
         todayCount={todayCount}
+        onCategoriesChanged={refreshCategories}
+        onTagsChanged={refreshTags}
       />
 
-      <div className="flex">
-        <Sidebar
-          open={sidebarOpen}
-          categories={categories}
-          tags={tags}
-          filters={filters}
-          onFilterChange={updateFilters}
-          onCategoriesChanged={refreshCategories}
-          onTagsChanged={refreshTags}
+      <div className="flex flex-col flex-1 min-w-0">
+        <Header
+          search={filters.search}
+          onSearchChange={(search) => updateFilters({ search })}
+          sidebarCollapsed={sidebarCollapsed}
+          onToggleSidebar={() => setSidebarCollapsed((v) => !v)}
         />
 
-        <main className="flex-1 p-4 min-w-0 overflow-x-auto">
+        <main className="flex-1 overflow-y-auto overflow-x-auto p-6">
           {view === 'grid' ? (
             <Dashboard
               filters={filters}
@@ -171,14 +172,6 @@ export default function App() {
           )}
         </main>
       </div>
-
-      <button
-        onClick={() => handleNewNote()}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-2xl shadow-lg flex items-center justify-center z-40"
-        title="Nieuwe notitie"
-      >
-        +
-      </button>
 
       {pomodoroOpen && <PomodoroTimer onClose={() => setPomodoroOpen(false)} />}
 

@@ -69,10 +69,11 @@ export default function Dashboard({ filters, categories, onOpenNote, refreshKey 
   return (
     <div>
       <div className="masonry-columns">
-        {notes.map((note) => (
+        {notes.map((note, index) => (
           <NoteCard
             key={note.id}
             note={note}
+            index={index}
             categoryName={categoryMap[note.category_id]}
             searchTerm={filters.search}
             onClick={() => onOpenNote(note.id)}
