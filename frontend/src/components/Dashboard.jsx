@@ -68,7 +68,7 @@ export default function Dashboard({ filters, categories, onOpenNote, refreshKey 
 
   return (
     <div>
-      <div className="masonry-columns">
+      <div className="notes-grid">
         {notes.map((note) => (
           <NoteCard
             key={note.id}

@@ -45,32 +45,28 @@ mark.search-highlight {
   border-radius: 2px;
 }
 
-.masonry-columns {
-  column-count: 1;
-  column-gap: 1rem;
+.notes-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
 }
 
 @media (min-width: 640px) {
-  .masonry-columns {
-    column-count: 2;
+  .notes-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (min-width: 1024px) {
-  .masonry-columns {
-    column-count: 3;
+  .notes-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
 @media (min-width: 1280px) {
-  .masonry-columns {
-    column-count: 4;
+  .notes-grid {
+    grid-template-columns: repeat(5, 1fr);
   }
-}
-
-.masonry-item {
-  break-inside: avoid;
-  margin-bottom: 1rem;
 }
 
 /* ── Kleurthema's ─────────────────────────────────────────────────────── */

@@ -5,93 +5,46 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { api } from '../lib/api.js';
-import { colorClasses, stripHtml } from '../lib/utils.jsx';
+import { colorClasses, stripHtml, COLUMN_COLORS } from '../lib/utils.jsx';
 import KanbanColumn from './KanbanColumn.jsx';
 
 const NO_LANE = 'none';
 
-function findCell(cells, noteId) {
-  for (const [laneKey, cols] of Object.entries(cells)) {
-    for (const [colId, notes] of Object.entries(cols)) {
-      if (notes.some((n) => n.id === noteId)) return { laneKey, colId };
-    }
-  }
-  return null;
-}
+function LaneLabel({ lane, onRename, onDelete }) {
+  const [editing, setEditing] = useState(false);
+  const [nameVal, setNameVal] = useState(lane.name);
 
-function LaneRow({ lane, laneKey, columns, cells, boardId, onOpenNote, onNewNote,
-  onRenameColumn, onRecolorColumn, onDeleteColumn, onDragStart, onDragOver, onDragEnd,
-  onRenameLane, onDeleteLane, sensors, activeNote }) {
-
-  const [editingName, setEditingName] = useState(false);
-  const [nameVal, setNameVal] = useState(lane?.name || '');
-
-  function saveRename() {
-    if (nameVal.trim() && lane) onRenameLane(lane.id, nameVal.trim());
-    setEditingName(false);
+  function save() {
+    if (nameVal.trim()) onRename(lane.id, nameVal.trim());
+    setEditing(false);
   }
 
   return (
-    <div className="mb-6">
-      {/* Lane header */}
-      {lane && (
-        <div className="group flex items-center gap-2 mb-2 pl-1">
-          {editingName ? (
-            <input
-              autoFocus
-              className="text-sm font-semibold bg-transparent border-b border-blue-500 outline-none text-gray-800 dark:text-gray-100 w-40"
-              value={nameVal}
-              onChange={(e) => setNameVal(e.target.value)}
-              onBlur={saveRename}
-              onKeyDown={(e) => { if (e.key === 'Enter') saveRename(); if (e.key === 'Escape') setEditingName(false); }}
-            />
-          ) : (
-            <span
-              className="text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer hover:text-blue-500"
-              onClick={() => { setEditingName(true); setNameVal(lane.name); }}
-            >
-              {lane.name}
-            </span>
-          )}
-          <button
-            onClick={() => onDeleteLane(lane.id)}
-            className="opacity-0 group-hover:opacity-100 text-xs text-gray-400 hover:text-red-500"
-            title="Lane verwijderen"
-          >
-            ✕
-          </button>
-        </div>
+    <div className="group flex items-center gap-1.5 pr-3">
+      {editing ? (
+        <input
+          autoFocus
+          className="text-sm font-semibold bg-transparent border-b border-blue-500 outline-none text-gray-800 dark:text-gray-100 w-full min-w-0"
+          value={nameVal}
+          onChange={(e) => setNameVal(e.target.value)}
+          onBlur={save}
+          onKeyDown={(e) => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }}
+        />
+      ) : (
+        <button
+          className="text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-blue-500 text-left break-words w-full"
+          onClick={() => { setEditing(true); setNameVal(lane.name); }}
+        >
+          {lane.name}
+        </button>
       )}
-
-      {/* Columns for this lane */}
-      <DndContext sensors={sensors} collisionDetection={closestCorners}
-        onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
-        <div className="flex gap-4 overflow-x-auto pb-2 items-start">
-          {columns.map((col) => (
-            <KanbanColumn
-              key={`${laneKey}-${col.id}`}
-              boardId={boardId}
-              column={{ ...col, notes: cells[laneKey]?.[col.id] || [] }}
-              onOpenNote={onOpenNote}
-              onRename={onRenameColumn}
-              onRecolor={onRecolorColumn}
-              onDelete={onDeleteColumn}
-              onAddCard={(colId) => onNewNote(colId, lane?.id || null)}
-              hideHeader={!!lane}
-            />
-          ))}
-        </div>
-        <DragOverlay>
-          {activeNote && (
-            <div className={`rounded-xl p-3 shadow-lg border border-black/5 dark:border-white/10 w-72 ${colorClasses(activeNote.color)}`}>
-              <p className="font-medium text-sm text-gray-900 dark:text-gray-50 line-clamp-2">{activeNote.title || 'Untitled'}</p>
-              {stripHtml(activeNote.content).slice(0, 80) && (
-                <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">{stripHtml(activeNote.content).slice(0, 80)}</p>
-              )}
-            </div>
-          )}
-        </DragOverlay>
-      </DndContext>
+      <button
+        onClick={() => onDelete(lane.id)}
+        className="opacity-0 group-hover:opacity-100 text-xs text-gray-400 hover:text-red-500 shrink-0"
+        title="Lane verwijderen"
+      >
+        ✕
+      </button>
     </div>
   );
 }
@@ -180,7 +133,6 @@ export default function KanbanBoard({ onOpenNote, onNewNote, refreshKey }) {
     setBoard((prev) => ({ ...prev, columns: prev.columns.filter((c) => c.id !== colId) }));
   }
 
-  // Per-lane drag handlers (laneKey passed via closure)
   function makeDragHandlers(laneKey) {
     function handleDragStart(event) {
       activeLaneRef.current = laneKey;
@@ -299,51 +251,101 @@ export default function KanbanBoard({ onOpenNote, onNewNote, refreshKey }) {
 
       {board && (
         <>
-          {/* Column headers (shared across lanes) */}
+          {/* Swimlane column header bar — shown once above all lanes */}
           {haslanes && (
-            <div className="flex gap-4 mb-1 pl-28">
-              {board.columns.map((col) => (
-                <div key={col.id} className="w-72 shrink-0 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-3">
-                  {col.name}
-                </div>
-              ))}
+            <div className="flex items-stretch gap-4 mb-0 overflow-x-auto">
+              {/* Spacer matching lane-label column width */}
+              <div className="w-36 shrink-0" />
+              {/* Colored column headers */}
+              {board.columns.map((col) => {
+                const colColor = COLUMN_COLORS[col.color] || COLUMN_COLORS.gray;
+                const totalCards = Object.values(board.cells).reduce(
+                  (sum, laneCells) => sum + (laneCells[col.id]?.length || 0), 0
+                );
+                return (
+                  <div key={col.id} className={`w-72 shrink-0 rounded-t-xl px-3 py-2.5 border border-b-0 ${colColor} flex items-center gap-2`}>
+                    <button
+                      onClick={() => { }}
+                      className="flex-1 text-left text-sm font-semibold text-gray-800 dark:text-gray-100"
+                    >
+                      {col.name}
+                    </button>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{totalCards}</span>
+                  </div>
+                );
+              })}
             </div>
           )}
 
+          {/* Strong divider below the column header bar */}
+          {haslanes && (
+            <div className="border-b-2 border-gray-300 dark:border-gray-600 mb-4" />
+          )}
+
           {/* Lane rows */}
-          {laneRows.map((lane) => {
+          {laneRows.map((lane, idx) => {
             const laneKey = lane?.id || NO_LANE;
             const { handleDragStart, handleDragOver, handleDragEnd } = makeDragHandlers(laneKey);
             return (
-              <div key={laneKey} className={haslanes ? 'flex gap-2' : ''}>
-                {haslanes && (
-                  <div className="w-24 shrink-0 flex items-start pt-2 pr-2">
-                    <LaneRow
-                      lane={lane} laneKey={laneKey} columns={[]} cells={{}}
-                      boardId={activeBoardId} onOpenNote={onOpenNote} onNewNote={onNewNote}
-                      onRenameColumn={renameColumn} onRecolorColumn={recolorColumn} onDeleteColumn={deleteColumn}
-                      onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}
-                      onRenameLane={renameLane} onDeleteLane={deleteLane}
-                      sensors={sensors} activeNote={activeNote}
-                    />
-                  </div>
+              <div key={laneKey}>
+                {/* Separator between lanes */}
+                {haslanes && idx > 0 && (
+                  <div className="border-t-2 border-gray-200 dark:border-gray-700 my-4" />
                 )}
-                <div className="flex-1 min-w-0">
-                  <LaneRow
-                    lane={haslanes ? null : lane} laneKey={laneKey} columns={board.columns}
-                    cells={board.cells} boardId={activeBoardId} onOpenNote={onOpenNote} onNewNote={onNewNote}
-                    onRenameColumn={renameColumn} onRecolorColumn={recolorColumn} onDeleteColumn={deleteColumn}
-                    onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}
-                    onRenameLane={renameLane} onDeleteLane={deleteLane}
-                    sensors={sensors} activeNote={activeNote}
-                  />
+
+                <div className={`flex items-start gap-4 ${haslanes ? 'py-1' : ''}`}>
+                  {/* Lane label column */}
+                  {haslanes && (
+                    <div className="w-36 shrink-0 self-stretch flex items-center border-r-2 border-gray-200 dark:border-gray-700">
+                      <LaneLabel
+                        lane={lane}
+                        onRename={renameLane}
+                        onDelete={deleteLane}
+                      />
+                    </div>
+                  )}
+
+                  {/* Columns in their own DndContext */}
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCorners}
+                    onDragStart={handleDragStart}
+                    onDragOver={handleDragOver}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <div className="flex gap-4 overflow-x-auto pb-2 items-start flex-1">
+                      {board.columns.map((col) => (
+                        <KanbanColumn
+                          key={`${laneKey}-${col.id}`}
+                          boardId={activeBoardId}
+                          column={{ ...col, notes: board.cells[laneKey]?.[col.id] || [] }}
+                          onOpenNote={onOpenNote}
+                          onRename={renameColumn}
+                          onRecolor={recolorColumn}
+                          onDelete={deleteColumn}
+                          onAddCard={(colId) => onNewNote(colId, lane?.id || null)}
+                          hideHeader={haslanes}
+                        />
+                      ))}
+                    </div>
+                    <DragOverlay>
+                      {activeNote && (
+                        <div className={`rounded-xl p-3 shadow-lg border border-black/5 dark:border-white/10 w-72 ${colorClasses(activeNote.color)}`}>
+                          <p className="font-medium text-sm text-gray-900 dark:text-gray-50 line-clamp-2">{activeNote.title || 'Untitled'}</p>
+                          {stripHtml(activeNote.content).slice(0, 80) && (
+                            <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">{stripHtml(activeNote.content).slice(0, 80)}</p>
+                          )}
+                        </div>
+                      )}
+                    </DragOverlay>
+                  </DndContext>
                 </div>
               </div>
             );
           })}
 
           {/* Add column / lane */}
-          <div className="flex gap-3 mt-2">
+          <div className="flex gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button onClick={addColumn}
               className="px-4 py-2 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:border-gray-400 text-sm">
               + Kolom
